@@ -2,6 +2,7 @@
 #define LIST_VIEW_H
 
 #include <QTreeView>
+#include <QStandardItemModel>
 
 class list_view : public QTreeView
 {
@@ -12,6 +13,9 @@ class list_view : public QTreeView
     signals:
 
     public slots:
+    private:
+        unsigned item_cnt;
+        QStandardItemModel *model;
 
 };
 

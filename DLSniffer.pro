@@ -13,11 +13,22 @@ TEMPLATE = app
 LIBS += -ltins
 CONFIG += c++11
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    capture.cpp \
-    list_view.cpp
+HEADERS += \
+    sniffer/pkt_capture.h \
+    sniffer/pkt_processor.h \
+    sniffer/sniffer_manager.h \
+    ui/list_view.h \
+    ui/mainwindow.h \
+    utils/queue.h \
+    utils/queue_internal.h
 
-HEADERS  += mainwindow.h \
-    capture.h \
-    list_view.h
+SOURCES += \
+    sniffer/pkt_capture.cpp \
+    sniffer/pkt_processor.cpp \
+    sniffer/sniffer_manager.cpp \
+    ui/list_view.cpp \
+    ui/mainwindow.cpp \
+    utils/queue.c \
+    utils/queue_internal.c \
+    main.cpp
+

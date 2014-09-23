@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "list_view.h"
 
 class MainWindow : public QMainWindow
 {
@@ -10,6 +11,8 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = 0);
         ~MainWindow();
+    private:
+        list_view *lv;
 };
 
 #endif // MAINWINDOW_H
