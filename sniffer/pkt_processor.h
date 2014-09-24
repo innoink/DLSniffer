@@ -1,17 +1,38 @@
 #ifndef PKT_PROCESSOR_H
 #define PKT_PROCESSOR_H
 
-#include <QObject>
+#include <QThread>
+#include <QMutex>
+#include <tins/tins.h>
+#include "utils/queue.h"
 
-class pkt_processor : public QObject
+struct pkt_info_t {
+        unsigned long pkt_num;
+        char timestr[64];
+        char srcip[16], dstip[16];
+
+};
+
+class pkt_processor : public QThread
 {
         Q_OBJECT
     public:
-        explicit pkt_processor(QObject *parent = 0);
+        explicit pkt_processor(queue_t *pkt_queue, QMutex *stop_mutex);
+        void start_thrd();
+        void stop_thrd();
+    protected:
+        void run();
 
     signals:
+        void new_pkt(struct pkt_info_t *pkt_info);
 
-    public slots:
+    private:
+        void proc_pkt(Tins::Packet *pkt);
+    private:
+        queue_t *pkt_queue;
+        QMutex *stop_mutex;
+        bool stop;
+        unsigned long pkt_cnt;
 
 };
 
