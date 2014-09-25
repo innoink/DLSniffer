@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
+    delete smgr;
 }
 
 void MainWindow::create_actions()

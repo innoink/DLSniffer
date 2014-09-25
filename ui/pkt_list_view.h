@@ -3,7 +3,7 @@
 
 #include <QTreeView>
 #include <QStandardItemModel>
-#include "sniffer/pkt_processor.h"
+#include "sniffer/pkt_info.h"
 
 class pkt_list_view : public QTreeView
 {

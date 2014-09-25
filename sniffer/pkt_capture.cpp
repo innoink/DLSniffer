@@ -1,7 +1,7 @@
 #include "pkt_capture.h"
 
-pkt_capture::pkt_capture(queue_t *q, QMutex *stop_mutex) :
-    pkt_queue(q), stop_mutex(stop_mutex), stop(false)
+pkt_capture::pkt_capture(queue_t *pkt_queue, QMutex *stop_mutex) :
+    pkt_worker(pkt_queue, stop_mutex)
 {
 }
 
@@ -25,17 +25,3 @@ void pkt_capture::run()
     }
 }
 
-void pkt_capture::start_thrd()
-{
-    stop_mutex->lock();
-    stop = false;
-    stop_mutex->unlock();
-    start();
-}
-
-void pkt_capture::stop_thrd()
-{
-    stop_mutex->lock();
-    stop = true;
-    stop_mutex->unlock();
-}

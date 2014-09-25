@@ -55,7 +55,7 @@ bool sniffer_manager::init_sniffer()
     return true;
 }
 
-bool sniffer_manager::release_sniffer()
+void sniffer_manager::release_sniffer()
 {
     delete this->sniffer;
     this->sniffer = nullptr;
@@ -63,13 +63,13 @@ bool sniffer_manager::release_sniffer()
 
 void sniffer_manager::start_capture()
 {
-    pp_thrd->start_thrd();
-    pc_thrd->start_thrd();
+    pp_thrd->start_work();
+    pc_thrd->start_work();
 }
 
 //should have a callback
 void sniffer_manager::stop_capture()
 {
-    pc_thrd->stop_thrd();
-    pp_thrd->stop_thrd();
+    pc_thrd->stop_work();
+    pp_thrd->stop_work();
 }

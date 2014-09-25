@@ -4,34 +4,21 @@
 #include <QThread>
 #include <QMutex>
 #include <tins/tins.h>
-#include "utils/queue.h"
+#include "sniffer/pkt_worker.h"
+#include "sniffer/pkt_info.h"
 
-struct pkt_info_t {
-        unsigned long pkt_num;
-        char timestr[64];
-        char srcip[16], dstip[16];
-
-};
-
-class pkt_processor : public QThread
+class pkt_processor : public pkt_worker
 {
         Q_OBJECT
     public:
         explicit pkt_processor(queue_t *pkt_queue, QMutex *stop_mutex);
-        void start_thrd();
-        void stop_thrd();
-    protected:
+    private:
         void run();
-
     signals:
         void new_pkt(struct pkt_info_t *pkt_info);
-
     private:
         void proc_pkt(Tins::Packet *pkt);
     private:
-        queue_t *pkt_queue;
-        QMutex *stop_mutex;
-        bool stop;
         unsigned long pkt_cnt;
 
 };

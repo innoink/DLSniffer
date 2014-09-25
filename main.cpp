@@ -2,13 +2,17 @@
 #include "ui/select_nif_dlg.h"
 #include <QApplication>
 
+#include <iostream>
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-//    select_nif_dlg dlg(0, 0);
-//    dlg.exec();
+    std::cout << Tins::PDU::PDUType::RAW << std::endl;
+    std::cout << Tins::PDU::PDUType::ETHERNET_II << std::endl;
 
-    return a.exec();
+//    QApplication a(argc, argv);
+//    MainWindow w;
+//    w.show();
+
+//    return a.exec();
+    return 0;
 }

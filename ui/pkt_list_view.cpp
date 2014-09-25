@@ -27,9 +27,9 @@ void pkt_list_view::add_pkt_info(struct pkt_info_t *pkt_info)
     model->setItem(item_cnt, 0, item);
     item = new QStandardItem(pkt_info->timestr);
     model->setItem(item_cnt, 1, item);
-    item = new QStandardItem(pkt_info->srcip);
+    item = new QStandardItem(pkt_info->src);
     model->setItem(item_cnt, 2, item);
-    item = new QStandardItem(pkt_info->dstip);
+    item = new QStandardItem(pkt_info->dst);
     model->setItem(item_cnt, 3, item);
 
     item_cnt++;

@@ -16,13 +16,13 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = 0);
         ~MainWindow();
 
-    private slots:
-        void start();
-        void stop();
     private:
         void create_toolbars();
         void create_actions();
+        //slots:
         void select_nif();
+        void start();
+        void stop();
 
     private:
         sniffer_manager *smgr;

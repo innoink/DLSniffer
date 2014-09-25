@@ -10,7 +10,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = DLSniffer
 TEMPLATE = app
-LIBS += -ltins
 CONFIG += c++11
 
 HEADERS += \
@@ -21,7 +20,9 @@ HEADERS += \
     utils/queue.h \
     utils/queue_internal.h \
     ui/pkt_list_view.h \
-    ui/select_nif_dlg.h
+    ui/select_nif_dlg.h \
+    sniffer/pkt_worker.h \
+    sniffer/pkt_info.h
 
 SOURCES += \
     sniffer/pkt_capture.cpp \
@@ -32,5 +33,16 @@ SOURCES += \
     utils/queue_internal.c \
     main.cpp \
     ui/pkt_list_view.cpp \
-    ui/select_nif_dlg.cpp
+    ui/select_nif_dlg.cpp \
+    sniffer/pkt_worker.cpp
 
+unix:{
+    LIBS += -ltins
+
+}
+
+win32:{
+    DEFINES += _WIN32
+    DEFINES += WIN32
+    LIBS +=
+}

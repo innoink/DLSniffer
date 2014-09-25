@@ -16,7 +16,7 @@ class sniffer_manager : public QObject
         explicit sniffer_manager(QObject *parent = 0);
         ~sniffer_manager();
         bool init_sniffer();
-        bool release_sniffer();
+        void release_sniffer();
         void start_capture();
         void stop_capture();
         void set_filter(QString &flt);
