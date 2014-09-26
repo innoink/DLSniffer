@@ -18,6 +18,7 @@ class pkt_processor : public pkt_worker
         void new_pkt(struct pkt_info_t *pkt_info);
     private:
         void proc_pkt(Tins::Packet *pkt);
+        const char *__timestamp_to_str(Tins::Timestamp &timestamp);
     private:
         unsigned long pkt_cnt;
 

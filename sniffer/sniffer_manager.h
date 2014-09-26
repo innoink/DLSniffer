@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMutex>
+#include <QList>
 #include <tins/tins.h>
 #include "utils/queue.h"
 #include "pkt_capture.h"
@@ -22,12 +23,18 @@ class sniffer_manager : public QObject
         void set_filter(QString &flt);
         void set_nif(Tins::NetworkInterface nif);
         void set_promisc(bool b);
+        //should have a rfmon option for 802.11 mac!
+        //void set_rfmon(bool b);
         Tins::NetworkInterface get_nif();
+
+        void destroy_pkt_info_list();
+
     signals:
 
     public slots:
     public:
         pkt_processor *pp_thrd;
+        QList<pkt_info_t *> pkt_info_list;
     private:
         Tins::Sniffer *sniffer;
         Tins::SnifferConfiguration sconf;

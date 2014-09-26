@@ -21,6 +21,15 @@ sniffer_manager::~sniffer_manager()
     delete pc_stopmutex;
     delete pp_stopmutex;
     queue_destroy(pkt_queue);
+    destroy_pkt_info_list();
+
+}
+
+void sniffer_manager::destroy_pkt_info_list()
+{
+    for (auto i : pkt_info_list)
+        delete i;
+    pkt_info_list.clear();
 }
 
 void sniffer_manager::set_nif(Tins::NetworkInterface nif)

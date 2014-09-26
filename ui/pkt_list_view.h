@@ -12,11 +12,8 @@ class pkt_list_view : public QTreeView
         explicit pkt_list_view(QWidget *parent = 0);
         void set_header();
         void clear();
-
-    signals:
-
-    public slots:
-        void add_pkt_info(struct pkt_info_t *pkt_info);
+        void append_item(const char *timestr, const char *srcaddr, const char *dstaddr,
+                         const char *prot, uint32_t size);
     private:
         unsigned item_cnt;
         QStandardItemModel *model;

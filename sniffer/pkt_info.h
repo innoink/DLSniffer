@@ -2,6 +2,7 @@
 #define PKT_INFO_H
 
 #include <cstdint>
+#include <cstring>
 #include <vector>
 
 //layer i - frame
@@ -122,24 +123,83 @@ typedef union {
 
 struct pkt_info_t {
 
-    unsigned long        pkt_num;
+    enum layer_ii_type {
+        EthernetII
+    };
+
+    enum layer_iii_type {
+        ARP,
+        IP
+    };
+    enum layer_iv_type {
+        TCP,
+        UDP
+    };
+    enum layer_vii_type {
+        HTTP,
+        FTP,
+        TELNET,
+        DNS
+    };
     char                 timestr[64];
     char                 src[32];
     char                 dst[32];
+    char                 protocol[16];
     uint32_t             size;
+    uint8_t              max_layer;
     //whole packet data
     std::vector<uint8_t> data;
     //Layer I
     layer_i_t            LayerI;
     //LayerII
+    enum layer_ii_type   LayerIIType;
     layer_ii_t           LayerII;
     //LayerIII
+    enum layer_iii_type  LayerIIIType;
     layer_iii_t          LayerIII;
-    //layerIV
+    //LayerIV
+    enum layer_iv_type   LayerIVType;
     layer_iv_t           LayerIV;
-    //layerVII
+    //LayerVII
+    enum layer_vii_type  LayerVIIType;
     layer_vii_t          LayerVII;
-
 };
+
+typedef struct pkt_info_t pkt_info_t;
+
+#define PKT_INFO_SET_TIMESTR(_pi, _ts) \
+    do { \
+        strncpy((_pi)->timestr, (_ts), 63); \
+        (_pi)->timestr[63] = '\0'; \
+    } while(0)
+#define PKT_INFO_SET_SRC(_pi, _src) \
+    do { \
+        strncpy((_pi)->src, (_src), 31); \
+        (_pi)->src[31] = '\0'; \
+    } while(0)
+#define PKT_INFO_SET_DST(_pi, _dst) \
+    do { \
+        strncpy((_pi)->dst, (_dst), 31); \
+        (_pi)->dst[31] = '\0'; \
+    } while(0)
+
+#define PKT_INFO_SET_PROTOCOL(_pi, _prot) \
+    do { \
+        strncpy((_pi)->protocol, (_prot), 15); \
+        (_pi)->protocol[15] = '\0'; \
+    } while(0)
+#define PKT_INFO_SET_SIZE(_pi, _size) \
+    do { \
+        (_pi)->size = (_size); \
+    } while (0)
+#define PKT_INFO_SET_MAX_LAYER(_pi, _max_layer) \
+    do { \
+        (_pi)->max_layer = (_max_layer); \
+    } while (0)
+#define PKT_INFO_SET_DATA(_pi, _data) \
+    do { \
+        (_pi)->data = std::move((_data)); \
+    } while (0)
+
 
 #endif // PKT_INFO_H

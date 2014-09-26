@@ -16,6 +16,8 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = 0);
         ~MainWindow();
 
+        void rcv_pkt_info(pkt_info_t *pkt_info);
+
     private:
         void create_toolbars();
         void create_actions();

@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     create_actions();
     create_toolbars();
 
-    connect(smgr->pp_thrd, &pkt_processor::new_pkt, lv, &pkt_list_view::add_pkt_info);
+    connect(smgr->pp_thrd, &pkt_processor::new_pkt, this, &MainWindow::rcv_pkt_info);
 }
 
 MainWindow::~MainWindow()
@@ -83,5 +83,15 @@ void MainWindow::stop()
     smgr->stop_capture();
     act_stop->setEnabled(false);
     act_start->setEnabled(true);
+    smgr->destroy_pkt_info_list();
 }
 
+void MainWindow::rcv_pkt_info(pkt_info_t *pkt_info)
+{
+    lv->append_item(pkt_info->timestr,
+                    pkt_info->src,
+                    pkt_info->dst,
+                    pkt_info->protocol,
+                    pkt_info->size);
+    smgr->pkt_info_list.append(pkt_info);
+}
