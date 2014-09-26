@@ -6,11 +6,11 @@ sniffer_manager::sniffer_manager(QObject *parent) :
 {
     sniffer = nullptr;
     pkt_queue = queue_create();
-    pc_stopmutex = new QMutex;
-    pp_stopmutex = new QMutex;
+    pc_stoprwlock = new QReadWriteLock;
+    pp_stoprwlock = new QReadWriteLock;
 
-    pc_thrd = new pkt_capture(pkt_queue, pc_stopmutex);
-    pp_thrd = new pkt_processor(pkt_queue, pp_stopmutex);
+    pc_thrd = new pkt_capture(pkt_queue, pc_stoprwlock);
+    pp_thrd = new pkt_processor(pkt_queue, pp_stoprwlock);
 }
 sniffer_manager::~sniffer_manager()
 {
@@ -18,8 +18,8 @@ sniffer_manager::~sniffer_manager()
     release_sniffer();
     delete pc_thrd;
     delete pp_thrd;
-    delete pc_stopmutex;
-    delete pp_stopmutex;
+    delete pc_stoprwlock;
+    delete pp_stoprwlock;
     queue_destroy(pkt_queue);
     destroy_pkt_info_list();
 

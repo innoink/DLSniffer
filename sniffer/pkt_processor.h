@@ -2,7 +2,7 @@
 #define PKT_PROCESSOR_H
 
 #include <QThread>
-#include <QMutex>
+#include <QReadWriteLock>
 #include <tins/tins.h>
 #include "sniffer/pkt_worker.h"
 #include "sniffer/pkt_info.h"
@@ -11,7 +11,7 @@ class pkt_processor : public pkt_worker
 {
         Q_OBJECT
     public:
-        explicit pkt_processor(queue_t *pkt_queue, QMutex *stop_mutex);
+        explicit pkt_processor(queue_t *pkt_queue, QReadWriteLock *stop_rwlock);
     private:
         void run();
     signals:

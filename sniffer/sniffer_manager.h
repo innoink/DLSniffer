@@ -2,7 +2,7 @@
 #define SNIFFER_MANAGER_H
 
 #include <QObject>
-#include <QMutex>
+#include <QReadWriteLock>
 #include <QList>
 #include <tins/tins.h>
 #include "utils/queue.h"
@@ -40,7 +40,7 @@ class sniffer_manager : public QObject
         Tins::SnifferConfiguration sconf;
         Tins::NetworkInterface nif;
         pkt_capture *pc_thrd;
-        QMutex *pc_stopmutex, *pp_stopmutex;
+        QReadWriteLock *pc_stoprwlock, *pp_stoprwlock;
         queue_t *pkt_queue;
 
 };

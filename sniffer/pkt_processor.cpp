@@ -5,8 +5,8 @@
 
 #include <QDebug>
 
-pkt_processor::pkt_processor(queue_t *pkt_queue, QMutex *stop_mutex) :
-    pkt_worker(pkt_queue, stop_mutex), pkt_cnt(0)
+pkt_processor::pkt_processor(queue_t *pkt_queue, QReadWriteLock *stop_rwlock) :
+    pkt_worker(pkt_queue, stop_rwlock), pkt_cnt(0)
 {
 }
 void pkt_deleter(void *pkt)
@@ -20,12 +20,12 @@ void pkt_processor::run()
     Tins::Packet *pkt;
     pkt_cnt = 0;
     while (true) {
-        stop_mutex->lock();
+        stop_rwlock->lockForRead();
         if (stop) {
-            stop_mutex->unlock();
+            stop_rwlock->unlock();
             break;
         }
-        stop_mutex->unlock();
+        stop_rwlock->unlock();
         queue_get_wait(pkt_queue, (void **)&pkt);
         if (pkt == nullptr)
             continue;
