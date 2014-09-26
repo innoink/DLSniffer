@@ -73,6 +73,7 @@ void MainWindow::select_nif()
 void MainWindow::start()
 {
     lv->clear();
+    smgr->destroy_pkt_info_list();
     smgr->start_capture();
     act_start->setEnabled(false);
     act_stop->setEnabled(true);
@@ -83,7 +84,6 @@ void MainWindow::stop()
     smgr->stop_capture();
     act_stop->setEnabled(false);
     act_start->setEnabled(true);
-    smgr->destroy_pkt_info_list();
 }
 
 void MainWindow::rcv_pkt_info(pkt_info_t *pkt_info)

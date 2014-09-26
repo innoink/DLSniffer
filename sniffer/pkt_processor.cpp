@@ -27,14 +27,17 @@ void pkt_processor::run()
         }
         stop_mutex->unlock();
         queue_get_wait(pkt_queue, (void **)&pkt);
+        if (pkt == nullptr)
+            continue;
         proc_pkt(pkt);
+        printf("queue size:\t%d\n", queue_elements(pkt_queue));
         delete pkt;
     }
     queue_flush_complete(pkt_queue, pkt_deleter);
 
 }
 
-
+//Tins::Packet -> pkt_info_t
 void pkt_processor::proc_pkt(Tins::Packet *pkt)
 {
     static struct pkt_info_t *pkt_info;

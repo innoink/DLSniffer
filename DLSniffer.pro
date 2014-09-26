@@ -22,7 +22,8 @@ HEADERS += \
     ui/pkt_list_view.h \
     ui/select_nif_dlg.h \
     sniffer/pkt_worker.h \
-    sniffer/pkt_info.h
+    sniffer/pkt_info.h \
+    ui/pkt_tree_view.h
 
 SOURCES += \
     sniffer/pkt_capture.cpp \
@@ -34,7 +35,8 @@ SOURCES += \
     main.cpp \
     ui/pkt_list_view.cpp \
     ui/select_nif_dlg.cpp \
-    sniffer/pkt_worker.cpp
+    sniffer/pkt_worker.cpp \
+    ui/pkt_tree_view.cpp
 
 unix:{
     LIBS += -ltins

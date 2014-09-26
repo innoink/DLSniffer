@@ -11,12 +11,12 @@ pkt_list_view::pkt_list_view(QWidget *parent) :
 void pkt_list_view::set_header()
 {
     model->setColumnCount(6);
-    model->setHeaderData(0, Qt::Horizontal, tr("序号"));
-    model->setHeaderData(1, Qt::Horizontal, tr("时间"));
-    model->setHeaderData(2, Qt::Horizontal, tr("来源地址"));
-    model->setHeaderData(3, Qt::Horizontal, tr("目标地址"));
-    model->setHeaderData(4, Qt::Horizontal, tr("协议"));
-    model->setHeaderData(5, Qt::Horizontal, tr("发送长度"));
+    model->setHeaderData(0, Qt::Horizontal, tr("No."));
+    model->setHeaderData(1, Qt::Horizontal, tr("Time"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Source Address"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Target Address"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Protocol"));
+    model->setHeaderData(5, Qt::Horizontal, tr("Packet Size"));
 }
 
 void pkt_list_view::append_item(const char *timestr, const char *srcaddr, const char *dstaddr,
