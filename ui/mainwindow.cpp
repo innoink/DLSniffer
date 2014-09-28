@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QMessageBox>
+#include "sniffer/dlsniffer_defs.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,7 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     create_actions();
     create_toolbars();
 
-    connect(smgr->pp_thrd, &pkt_processor::new_pkt, this, &MainWindow::rcv_pkt_info);
+    smgr->set_filter(DLSNIFFER_FILTER);
+
+    connect(smgr->pp_thrd, &pkt_processor::new_pkt_info, this, &MainWindow::rcv_pkt_info);
+    connect(lv->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::proc_selected_item);
 }
 
 MainWindow::~MainWindow()
@@ -88,10 +92,15 @@ void MainWindow::stop()
 
 void MainWindow::rcv_pkt_info(pkt_info_t *pkt_info)
 {
-    lv->append_item(pkt_info->timestr,
-                    pkt_info->src,
-                    pkt_info->dst,
-                    pkt_info->protocol,
-                    pkt_info->size);
+    lv->append_item(pkt_info->overview.timestampstr,
+                    pkt_info->overview.src,
+                    pkt_info->overview.dst,
+                    pkt_info->overview.protocol,
+                    pkt_info->overview.size);
     smgr->pkt_info_list.append(pkt_info);
+}
+
+void MainWindow::proc_selected_item(const QItemSelection &selected, const QItemSelection &deselected)
+{
+
 }

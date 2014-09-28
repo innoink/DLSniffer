@@ -22,8 +22,10 @@ HEADERS += \
     ui/pkt_list_view.h \
     ui/select_nif_dlg.h \
     sniffer/pkt_worker.h \
+    ui/pkt_tree_view.h \
+    unused/pkt_info.h \
     sniffer/pkt_info.h \
-    ui/pkt_tree_view.h
+    sniffer/dlsniffer_defs.h
 
 SOURCES += \
     sniffer/pkt_capture.cpp \

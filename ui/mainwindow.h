@@ -4,9 +4,11 @@
 #include <QMainWindow>
 #include <QToolBar>
 #include <QAction>
+#include <QList>
 #include "ui/pkt_list_view.h"
 #include "ui/select_nif_dlg.h"
 #include "sniffer/sniffer_manager.h"
+#include "sniffer/pkt_info.h"
 
 class MainWindow : public QMainWindow
 {
@@ -25,9 +27,12 @@ class MainWindow : public QMainWindow
         void select_nif();
         void start();
         void stop();
+        void proc_selected_item(const QItemSelection & selected,
+                                const QItemSelection & deselected);
 
     private:
         sniffer_manager *smgr;
+        QList<struct pkt_info_t *> pkt_info_list;
 
         pkt_list_view *lv;
         QToolBar *tb_work;

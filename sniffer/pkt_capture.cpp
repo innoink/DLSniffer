@@ -13,6 +13,7 @@ void pkt_capture::set_sniffer(Tins::Sniffer *sniffer)
 void pkt_capture::run()
 {
     Tins::Packet *pkt;
+    sniffer->set_extract_raw_pdus(true);
     while (true) {
         stop_rwlock->lockForRead();
         if (stop) {

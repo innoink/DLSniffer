@@ -15,10 +15,11 @@ class pkt_processor : public pkt_worker
     private:
         void run();
     signals:
-        void new_pkt(pkt_info_t *pkt_info);
+        void new_pkt_info(pkt_info_t *pkt_info);
     private:
         void proc_pkt(Tins::Packet *pkt);
         const char *__timestamp_to_str(Tins::Timestamp &timestamp);
+        bool __set_app_layer_protocol(struct pkt_info_t *pi);
     private:
         unsigned long pkt_cnt;
 

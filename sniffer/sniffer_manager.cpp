@@ -42,9 +42,9 @@ Tins::NetworkInterface sniffer_manager::get_nif()
     return nif;
 }
 
-void sniffer_manager::set_filter(QString &flt)
+void sniffer_manager::set_filter(const char *flt)
 {
-    sconf.set_filter(flt.toStdString());
+    sconf.set_filter(flt);
 }
 
 void sniffer_manager::set_promisc(bool b)

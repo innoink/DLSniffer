@@ -20,7 +20,7 @@ class sniffer_manager : public QObject
         void release_sniffer();
         void start_capture();
         void stop_capture();
-        void set_filter(QString &flt);
+        void set_filter(const char *flt);
         void set_nif(Tins::NetworkInterface nif);
         void set_promisc(bool b);
         //should have a rfmon option for 802.11 mac!
