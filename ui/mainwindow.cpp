@@ -11,8 +11,10 @@ MainWindow::MainWindow(QWidget *parent)
     smgr = new sniffer_manager;
 
     lv = new pkt_list_view(this);
+    tv = new pkt_tree_view(this);
     QSplitter *splitter = new QSplitter(this);
     splitter->addWidget(lv);
+    splitter->addWidget(tv);
     setCentralWidget(splitter);
 
     create_actions();
@@ -77,6 +79,7 @@ void MainWindow::select_nif()
 void MainWindow::start()
 {
     lv->clear();
+    tv->clear();
     smgr->destroy_pkt_info_list();
     smgr->start_capture();
     act_start->setEnabled(false);
@@ -102,5 +105,12 @@ void MainWindow::rcv_pkt_info(pkt_info_t *pkt_info)
 
 void MainWindow::proc_selected_item(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    tv->clear();
 
+    QModelIndexList items = selected.indexes();
+    QModelIndex     index = items.first();
+    current_pkt_num = lv->get_item_num(index);
+    if (current_pkt_num >= 0 && current_pkt_num <= smgr->pkt_info_list.size()) {
+        tv->add_pkt_info_item(smgr->pkt_info_list[current_pkt_num]);
+    }
 }

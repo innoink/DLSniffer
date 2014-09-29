@@ -256,7 +256,7 @@ const char *pkt_processor::__timestamp_to_str(Tins::Timestamp &timestamp)
     time_t sec_tv = timestamp.seconds();
     struct tm *localtm = std::localtime(&sec_tv);
     static char tmpstr[64];
-    memset(tmpstr, 0x0, sizeof(tmpstr));
+    memset(tmpstr, 0x00, sizeof(tmpstr));
     std::strftime(tmpstr, 31, "%F %T", localtm);
     std::snprintf(tmpstr + strlen(tmpstr), 31, " %lu ms %lu us",
                   (unsigned long)timestamp.microseconds() / 1000,

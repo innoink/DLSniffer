@@ -47,3 +47,8 @@ void pkt_list_view::clear()
     item_cnt = 0;
     set_header();
 }
+
+int pkt_list_view::get_item_num(QModelIndex &index)
+{
+    return model->data(index, 0).toString().toInt();
+}

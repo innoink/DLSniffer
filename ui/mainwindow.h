@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QList>
 #include "ui/pkt_list_view.h"
+#include "ui/pkt_tree_view.h"
 #include "ui/select_nif_dlg.h"
 #include "sniffer/sniffer_manager.h"
 #include "sniffer/pkt_info.h"
@@ -32,9 +33,10 @@ class MainWindow : public QMainWindow
 
     private:
         sniffer_manager *smgr;
-        QList<struct pkt_info_t *> pkt_info_list;
+        int current_pkt_num;
 
         pkt_list_view *lv;
+        pkt_tree_view *tv;
         QToolBar *tb_work;
 
         QAction *act_start;

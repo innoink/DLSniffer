@@ -14,6 +14,8 @@ class pkt_list_view : public QTreeView
         void clear();
         void append_item(const char *timestr, const char *srcaddr, const char *dstaddr,
                          const char *prot, uint32_t size);
+
+        int get_item_num(QModelIndex &index);
     private:
         unsigned item_cnt;
         QStandardItemModel *model;
