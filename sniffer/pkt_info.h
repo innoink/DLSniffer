@@ -18,7 +18,8 @@ struct pkt_info_t {
         SNMP,
         ARP,
         ICMP,
-        UNKNOWN
+        UNKNOWN_TCP,
+        UNKNOWN_UDP
     } top_pdu_type;
     struct {
         Tins::RawPDU       *raw_pdu;
