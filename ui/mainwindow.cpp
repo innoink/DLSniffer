@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QMessageBox>
+#include <QBuffer>
 #include "sniffer/dlsniffer_defs.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,9 +13,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     lv = new pkt_list_view(this);
     tv = new pkt_tree_view(this);
+    hex_view = new QHexView(this);
     QSplitter *splitter = new QSplitter(this);
+    QSplitter *splitter_2 = new QSplitter(Qt::Vertical);
     splitter->addWidget(lv);
-    splitter->addWidget(tv);
+    splitter_2->addWidget(tv);
+    splitter_2->addWidget(hex_view);
+    splitter->addWidget(splitter_2);
     setCentralWidget(splitter);
 
     create_actions();
@@ -105,12 +110,24 @@ void MainWindow::rcv_pkt_info(pkt_info_t *pkt_info)
 
 void MainWindow::proc_selected_item(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    static QByteArray ba;
+    static QBuffer buf;
     tv->clear();
+    hex_view->clear();
 
     QModelIndexList items = selected.indexes();
     QModelIndex     index = items.first();
     current_pkt_num = lv->get_item_num(index);
     if (current_pkt_num >= 0 && current_pkt_num <= smgr->pkt_info_list.size()) {
         tv->add_pkt_info_item(smgr->pkt_info_list[current_pkt_num]);
+        ba.clear();
+        ba.append((const char*)(smgr->pkt_info_list[current_pkt_num]->pdus.raw_pdu->payload().data()),
+                      smgr->pkt_info_list[current_pkt_num]->pdus.raw_pdu->payload().size());
+        if (buf.isOpen()) {
+            buf.close();
+        }
+        buf.setData(ba);
+        buf.open(QIODevice::ReadOnly);
+        hex_view->setData(&buf);
     }
 }

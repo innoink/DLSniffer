@@ -8,6 +8,7 @@
 #include "ui/pkt_list_view.h"
 #include "ui/pkt_tree_view.h"
 #include "ui/select_nif_dlg.h"
+#include "ui/QHexView/qhexview.h"
 #include "sniffer/sniffer_manager.h"
 #include "sniffer/pkt_info.h"
 
@@ -37,6 +38,9 @@ class MainWindow : public QMainWindow
 
         pkt_list_view *lv;
         pkt_tree_view *tv;
+
+        QHexView      *hex_view;
+
         QToolBar *tb_work;
 
         QAction *act_start;
