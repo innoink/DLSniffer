@@ -6,6 +6,7 @@
 #include <QStandardItemModel>
 #include <QDialogButtonBox>
 #include <QCheckBox>
+#include <QLineEdit>
 #include <tins/tins.h>
 #include <vector>
 #include <QPushButton>
@@ -17,6 +18,7 @@ class select_nif_dlg : public QDialog
         explicit select_nif_dlg(QWidget *parent = 0);
         Tins::NetworkInterface get_selected();
         bool use_promisc();
+        QString get_filter();
 
     signals:
 
@@ -32,6 +34,7 @@ class select_nif_dlg : public QDialog
         QDialogButtonBox *btnbox;
         QPushButton *btnok;
         QPushButton *btncancle;
+        QLineEdit *leflt;
 
         std::vector<Tins::NetworkInterface> all_nif;
         int selected;

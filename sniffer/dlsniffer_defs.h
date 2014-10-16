@@ -1,8 +1,8 @@
 #ifndef DLSNIFFER_DEFS_H
 #define DLSNIFFER_DEFS_H
 
-#define DLSNIFFER_FILTER ("arp or tcp or udp or icmp")
-
+//#define DLSNIFFER_FILTER ("arp or tcp or udp or icmp")
+#define DLSNIFFER_FILTER ("")
 // TCP 协议
 #define FTP_PORT 		(21)
 #define TELNET_PORT 	(23)

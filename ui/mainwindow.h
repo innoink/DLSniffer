@@ -46,6 +46,8 @@ class MainWindow : public QMainWindow
         QAction *act_start;
         QAction *act_stop;
         QAction *act_select_nif;
+
+
 };
 
 #endif // MAINWINDOW_H

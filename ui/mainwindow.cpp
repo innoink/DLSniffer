@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     create_actions();
     create_toolbars();
 
-    smgr->set_filter(DLSNIFFER_FILTER);
+//    smgr->set_filter(DLSNIFFER_FILTER);
 
     connect(smgr->pp_thrd, &pkt_processor::new_pkt_info, this, &MainWindow::rcv_pkt_info);
     connect(lv->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::proc_selected_item);
@@ -71,6 +71,7 @@ void MainWindow::select_nif()
     if (sndlg.exec() == QDialog::Accepted) {
         smgr->set_nif(sndlg.get_selected());
         smgr->set_promisc(sndlg.use_promisc());
+        smgr->set_filter(sndlg.get_filter().toStdString().data());
         if (!smgr->init_sniffer()) {
             QMessageBox::warning(this, tr("Sniffer"),
                                  QString(tr("Cannot init sniffer on ")).append(smgr->get_nif().name().c_str()),

@@ -30,7 +30,6 @@ struct pkt_info_t {
     } top_pdu_type;
     struct {
         Tins::RawPDU       *raw_pdu;
-        Tins::EthernetII   *eii_pdu;
     } pdus;
     QHash<enum pdu_type_t, Tins::PDU *> pdu_hash;
     QList<QPair<enum pdu_type_t, Tins::PDU *> > pdu_list;

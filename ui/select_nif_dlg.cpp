@@ -1,6 +1,7 @@
 #include "select_nif_dlg.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QLabel>
 
 select_nif_dlg::select_nif_dlg(QWidget *parent) :
     QDialog(parent), selected(0)
@@ -10,11 +11,16 @@ select_nif_dlg::select_nif_dlg(QWidget *parent) :
     this->btnbox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     this->btnok = btnbox->button(QDialogButtonBox::Ok);
     this->btncancle = btnbox->button(QDialogButtonBox::Cancel);
+    this->leflt = new QLineEdit;
     this->model = new QStandardItemModel;
 
     QVBoxLayout *vl = new QVBoxLayout(this);
+    QHBoxLayout *hl = new QHBoxLayout;
+    hl->addWidget(new QLabel(tr("Filter:")));
+    hl->addWidget(leflt);
     vl->addWidget(nif_list_view);
     vl->addWidget(cb_promisc);
+    vl->addLayout(hl);
     vl->addWidget(btnbox);
 
     btnok->setEnabled(false);
@@ -57,6 +63,11 @@ void select_nif_dlg::set_choose(QStandardItem *item)
 Tins::NetworkInterface select_nif_dlg::get_selected()
 {
     return all_nif[selected];
+}
+
+QString select_nif_dlg::get_filter()
+{
+    return this->leflt->text();
 }
 
 bool select_nif_dlg::use_promisc()

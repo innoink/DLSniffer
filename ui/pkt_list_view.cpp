@@ -37,7 +37,6 @@ void pkt_list_view::append_item(const char *timestr, const char *srcaddr, const 
     item = new QStandardItem(QString::number(size));
     model->setItem(item_cnt, 5, item);
 
-
     item_cnt++;
 }
 

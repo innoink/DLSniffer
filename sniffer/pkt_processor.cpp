@@ -9,6 +9,16 @@
 pkt_processor::pkt_processor(queue_t *pkt_queue, QReadWriteLock *stop_rwlock) :
     pkt_worker(pkt_queue, stop_rwlock), pkt_cnt(0)
 {
+    port_protocol_map.insert(HTTP_PORT, {pkt_info_t::HTTP, pkt_info_t::TCP, "HTTP"});
+    port_protocol_map.insert(HTTPS_PORT, {pkt_info_t::HTTPS, pkt_info_t::TCP, "HTTPS"});
+    port_protocol_map.insert(FTP_PORT, {pkt_info_t::FTP, pkt_info_t::TCP, "FTP"});
+    port_protocol_map.insert(DNS_PORT, {pkt_info_t::DNS, pkt_info_t::UDP, "DNS"});
+    port_protocol_map.insert(SMTP_PORT, {pkt_info_t::SMTP, pkt_info_t::TCP, "SMTP"});
+    port_protocol_map.insert(POP3_PORT, {pkt_info_t::POP3, pkt_info_t::TCP, "POP3"});
+    port_protocol_map.insert(SNMP_PORT, {pkt_info_t::SNMP, pkt_info_t::UDP, "SNMP"});
+    port_protocol_map.insert(IMAP_PORT, {pkt_info_t::IMAP, pkt_info_t::TCP, "IMAP"});
+    port_protocol_map.insert(TELNET_PORT, {pkt_info_t::TELNET, pkt_info_t::TCP, "TELNET"});
+
 }
 void pkt_deleter(void *pkt)
 {
@@ -62,7 +72,6 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
 
     pkt_info = new struct pkt_info_t;
     pkt_info->pdus.raw_pdu = raw_pdu;
-    pkt_info->pdus.eii_pdu = eii_pdu;
     pkt_info->pdu_hash.insert(pkt_info_t::EthernetII, eii_pdu);
     pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::EthernetII, eii_pdu));
     //check valid pdu
@@ -72,17 +81,14 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
         goto proc_failed;
     pdu = pdu->inner_pdu();
     if (pdu->pdu_type() == Tins::PDU::ARP) {
-        pkt_info->top_pdu_type = pkt_info_t::pdu_type_t::ARP;
         pkt_info->pdu_hash.insert(pkt_info_t::ARP, pdu);
         pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::ARP, pdu));
-
     } else if (pdu->pdu_type() == Tins::PDU::IP) {
         if (pdu->inner_pdu() == nullptr)
             goto proc_failed;
         pkt_info->pdu_hash.insert(pkt_info_t::IP, pdu);
         pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::IP, pdu));
         pdu = pdu->inner_pdu();
-
         if (pdu->pdu_type() == Tins::PDU::TCP) {
             pkt_info->pdu_hash.insert(pkt_info_t::TCP, pdu);
             pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::TCP, pdu));
@@ -96,100 +102,54 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
         } else {
             goto proc_failed;
         }
-        if (pdu->pdu_type() == Tins::PDU::TCP || pdu->pdu_type() == Tins::PDU::UDP) {
-            if (!__set_app_layer_protocol(pkt_info)) {
-                qDebug() << __LINE__;
-                goto proc_failed;
-            }
-        }
     } else {
+        goto proc_failed;
+    }
+    if (!__set_top_layer_protocol(pkt_info)) {
+        qDebug() << __LINE__;
         goto proc_failed;
     }
 
     //fullfill other fileds
-    static const char *prot;
     pkt_info->timestamp = pkt->timestamp();
     strncpy(pkt_info->overview.timestampstr, __timestamp_to_str(pkt_info->timestamp), 63);
     pkt_info->overview.timestampstr[63] = '\0';
     pkt_info->overview.size = raw_pdu->size();
-    if (pkt_info->top_pdu_type == pkt_info_t::pdu_type_t::ARP) {
+    if (pkt_info->pdu_hash.contains(pkt_info_t::ARP)) {
         strncpy(pkt_info->overview.src,
                 static_cast<Tins::EthernetII*>(pkt_info->pdu_hash.value(pkt_info_t::EthernetII))->src_addr().to_string().data(),
                 31);
         strncpy(pkt_info->overview.dst,
                 static_cast<Tins::EthernetII*>(pkt_info->pdu_hash.value(pkt_info_t::EthernetII))->dst_addr().to_string().data(),
                 31);
-        prot = "ARP";
 
     } else {
+        char s_sp[8] = {0}, s_dp[8] = {0};
+
         if (pkt_info->pdu_hash.contains(pkt_info_t::TCP)) {
-            std::sprintf(pkt_info->overview.src,
-                         "%s:%d",
-                         static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->src_addr().to_string().data(),
+            std::sprintf(s_sp,
+                         ":%d",
                          static_cast<Tins::TCP*>(pkt_info->pdu_hash.value(pkt_info_t::TCP))->sport());
-            std::sprintf(pkt_info->overview.dst,
-                         "%s:%d",
-                         static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->dst_addr().to_string().data(),
+            std::sprintf(s_dp,
+                         ":%d",
                          static_cast<Tins::TCP*>(pkt_info->pdu_hash.value(pkt_info_t::TCP))->dport());
         } else if (pkt_info->pdu_hash.contains(pkt_info_t::UDP)) {
-            std::sprintf(pkt_info->overview.src,
-                         "%s:%d",
-                         static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->src_addr().to_string().data(),
+            std::sprintf(s_sp,
+                         ":%d",
                          static_cast<Tins::UDP*>(pkt_info->pdu_hash.value(pkt_info_t::UDP))->sport());
-            std::sprintf(pkt_info->overview.dst,
-                         "%s:%d",
-                         static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->dst_addr().to_string().data(),
+            std::sprintf(s_dp,
+                         ":%d",
                          static_cast<Tins::UDP*>(pkt_info->pdu_hash.value(pkt_info_t::UDP))->dport());
-        } else {
-            strcpy(pkt_info->overview.src,
-                   static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->src_addr().to_string().data());
-            strcpy(pkt_info->overview.dst,
-                         static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->dst_addr().to_string().data());
         }
-        switch (pkt_info->top_pdu_type) {
-            case pkt_info_t::pdu_type_t::FTP:
-                prot = "FTP";
-                break;
-            case pkt_info_t::pdu_type_t::DNS:
-                prot = "DNS";
-                break;
-            case pkt_info_t::pdu_type_t::HTTP:
-                prot = "HTTP";
-                break;
-            case pkt_info_t::pdu_type_t::HTTPS:
-                prot = "HTTPS";
-                break;
-            case pkt_info_t::pdu_type_t::IMAP:
-                prot = "IMAP";
-                break;
-            case pkt_info_t::pdu_type_t::POP3:
-                prot = "POP3";
-                break;
-            case pkt_info_t::pdu_type_t::SMTP:
-                prot = "SMTP";
-                break;
-            case pkt_info_t::pdu_type_t::SNMP:
-                prot = "SNMP";
-                break;
-            case pkt_info_t::pdu_type_t::TELNET:
-                prot = "TELNET";
-                break;
-            case pkt_info_t::pdu_type_t::ICMP:
-                prot = "ICMP";
-                break;
-            case pkt_info_t::pdu_type_t::UNKNOWN_TCP:
-                prot = "TCP";
-                break;
-            case pkt_info_t::pdu_type_t::UNKNOWN_UDP:
-                prot = "UDP";
-                break;
-            default:
-                qDebug() << __LINE__;
-
-                goto proc_failed;
-        }
+        std::sprintf(pkt_info->overview.src,
+                     "%s%s",
+                     static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->src_addr().to_string().data(),
+                     s_sp);
+        std::sprintf(pkt_info->overview.dst,
+                     "%s%s",
+                     static_cast<Tins::IP*>(pkt_info->pdu_hash.value(pkt_info_t::IP))->dst_addr().to_string().data(),
+                     s_dp);
     }
-    strcpy(pkt_info->overview.protocol, prot);
 
     for (QPair<enum pkt_info_t::pdu_type_t, Tins::PDU *> pair : pkt_info->pdu_list) {
         __run_processors(pair);
@@ -202,66 +162,63 @@ proc_failed:
     fprintf(stderr, "proc failed!\n");
     delete raw_pdu;
     if (pkt_info != nullptr) {
-        delete pkt_info->pdus.eii_pdu;
         delete pkt_info;
     }
     return;
 }
 
-bool pkt_processor::__set_app_layer_protocol(pkt_info_t *pi)
+bool pkt_processor::__set_top_layer_protocol(pkt_info_t *pi)
 {
-    static uint16_t sp, dp;
+    static uint16_t sp = -1, dp = -1;
     static Tins::TCP *tcp_pdu;
     static Tins::UDP *udp_pdu;
-    static Tins::IP *ip_pdu;
-    static bool is_tcp, is_udp;
-    is_tcp = is_udp = false;
-    if (!pi->pdu_hash.contains(pkt_info_t::IP)) {
-        qDebug() << __LINE__;
-
-        return false;
+    if (pi->pdu_hash.contains(pkt_info_t::ARP)) {
+            pi->top_pdu_type = pkt_info_t::ARP;
+            strcpy(pi->overview.protocol, "ARP");
+            return true;
     }
     if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
         tcp_pdu = static_cast<Tins::TCP *>(pi->pdu_hash.value(pkt_info_t::TCP));
         sp = tcp_pdu->sport();
         dp = tcp_pdu->dport();
-        is_tcp = true;
     } else if (pi->pdu_hash.contains(pkt_info_t::UDP)) {
         udp_pdu = static_cast<Tins::UDP *>(pi->pdu_hash.value(pkt_info_t::UDP));
         sp = udp_pdu->sport();
         dp = udp_pdu->dport();
-        is_udp = true;
+    }
+    int known_port = -1;
+    if (port_protocol_map.contains(sp)) known_port = sp;
+    else if (port_protocol_map.contains(dp)) known_port = dp;
+    if (known_port != -1) {
+        if (pi->pdu_hash.contains(port_protocol_map.value(known_port).trans_type)) {
+            pi->top_pdu_type = port_protocol_map.value(known_port).app_type;
+            strcpy(pi->overview.protocol, port_protocol_map.value(known_port).str);
+        }
+    } else if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
+        pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_TCP;
+        strcpy(pi->overview.protocol, "TCP");
+    } else if (pi->pdu_hash.contains(pkt_info_t::UDP)) {
+        pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_UDP;
+        strcpy(pi->overview.protocol, "UDP");
     } else {
         qDebug() << __LINE__;
-
         return false;
     }
-    if (is_tcp && (sp == FTP_PORT || dp == FTP_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::FTP;
-    } else if (is_tcp && (sp == HTTP_PORT || dp == HTTP_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::HTTP;
-    } else if (is_tcp && (sp == HTTPS_PORT || dp == HTTPS_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::HTTPS;
-    } else if (is_udp && (sp == DNS_PORT || dp == DNS_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::DNS;
-    } else if (is_tcp && (sp == SMTP_PORT || dp == SMTP_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::SMTP;
-    } else if (is_tcp && (sp == POP3_PORT || dp == POP3_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::POP3;
-    } else if (is_udp && (sp == SNMP_PORT || dp == SNMP_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::SNMP;
-    } else if (is_tcp && (sp == TELNET_PORT || dp == TELNET_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::TELNET;
-    } else if (is_tcp && (sp == IMAP_PORT || dp == IMAP_PORT)) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::IMAP;
-    } else if (is_tcp){
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_TCP;
-    } else if (is_udp) {
-        pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_UDP;
-    } else {
-        qDebug() << __LINE__;
-
-        return false;
+    if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
+        if (tcp_pdu->get_flag(Tins::TCP::SYN) == 1 && tcp_pdu->get_flag(Tins::TCP::ACK) == 0) {
+            pi->top_pdu_type = pkt_info_t::pdu_type_t::TCP;
+            strcpy(pi->overview.protocol, "TCP_SYN");
+        }
+        if (tcp_pdu->get_flag(Tins::TCP::SYN) == 0 && tcp_pdu->get_flag(Tins::TCP::ACK) == 1) {
+            if (tcp_pdu->inner_pdu() == nullptr || tcp_pdu->inner_pdu()->size() == 0) {
+                pi->top_pdu_type = pkt_info_t::pdu_type_t::TCP;
+                strcpy(pi->overview.protocol, "TCP_ACK");
+            }
+        }
+        if (tcp_pdu->get_flag(Tins::TCP::SYN) == 1 && tcp_pdu->get_flag(Tins::TCP::ACK) == 1) {
+            pi->top_pdu_type = pkt_info_t::pdu_type_t::TCP;
+            strcpy(pi->overview.protocol, "TCP_SYN_ACK");
+        }
     }
     return true;
 }
