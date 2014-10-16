@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "sniffer/protocol_sniffers.h"
 #include "sniffer_manager.h"
 
 sniffer_manager::sniffer_manager(QObject *parent) :
@@ -11,6 +12,8 @@ sniffer_manager::sniffer_manager(QObject *parent) :
 
     pc_thrd = new pkt_capture(pkt_queue, pc_stoprwlock);
     pp_thrd = new pkt_processor(pkt_queue, pp_stoprwlock);
+
+    pp_thrd->add_pdu_processor(pkt_info_t::HTTP, protocol_sniffers::http_sniffer);
 }
 sniffer_manager::~sniffer_manager()
 {

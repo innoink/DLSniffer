@@ -151,6 +151,7 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
     }
 
     for (QPair<enum pkt_info_t::pdu_type_t, Tins::PDU *> pair : pkt_info->pdu_list) {
+//        qDebug() << pair.first;
         __run_processors(pair);
     }
 
@@ -195,17 +196,29 @@ bool pkt_processor::__set_top_layer_protocol(pkt_info_t *pi)
     else if (port_protocol_map.contains(dp)) known_port = dp;
     if (known_port != -1) {
         if (pi->pdu_hash.contains(port_protocol_map.value(known_port).trans_type)) {
-            pi->top_pdu_type = port_protocol_map.value(known_port).app_type;
-            strcpy(pi->overview.protocol, port_protocol_map.value(known_port).str);
+            if (pi->pdu_hash.value(port_protocol_map.value(known_port).trans_type)->inner_pdu() != nullptr &&
+                pi->pdu_hash.value(port_protocol_map.value(known_port).trans_type)->inner_pdu()->size() != 0) {
+
+                pi->top_pdu_type = port_protocol_map.value(known_port).app_type;
+                strcpy(pi->overview.protocol, port_protocol_map.value(known_port).str);
+                pi->pdu_hash.insert(port_protocol_map.value(known_port).app_type,
+                                    pi->pdu_hash.value(port_protocol_map.value(known_port).trans_type)->inner_pdu());
+                pi->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(
+                                        port_protocol_map.value(known_port).app_type,
+                                        pi->pdu_hash.value(port_protocol_map.value(known_port).trans_type)->inner_pdu()));
+            }
         }
-    } else if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
+    }
+    if (known_port == -1 && pi->pdu_hash.contains(pkt_info_t::TCP)) {
         pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_TCP;
         strcpy(pi->overview.protocol, "TCP");
-    } else if (pi->pdu_hash.contains(pkt_info_t::UDP)) {
+    }
+    if (known_port == -1 && pi->pdu_hash.contains(pkt_info_t::UDP)) {
         pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_UDP;
         strcpy(pi->overview.protocol, "UDP");
-    } else {
-        qDebug() << __LINE__;
+    }
+    if (known_port == -1 && !pi->pdu_hash.contains(pkt_info_t::UDP) && !pi->pdu_hash.contains(pkt_info_t::TCP)) {
+//        qDebug() << __LINE__;
         return false;
     }
     if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
@@ -240,8 +253,21 @@ const char *pkt_processor::__timestamp_to_str(Tins::Timestamp &timestamp)
     return tmpstr;
 }
 
+void pkt_processor::add_pdu_processor(pkt_info_t::pdu_type_t ptype, pdu_processor_func_t processor)
+{
+    this->pdu_processors.insert(ptype, processor);
+}
+
+void pkt_processor::remove_pdu_processor(pkt_info_t::pdu_type_t ptype, pdu_processor_func_t processor)
+{
+    this->pdu_processors.remove(ptype, processor);
+}
+
+
 void pkt_processor::__run_processors(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU *> &pair)
 {
-
+    for (pdu_processor_func_t i : pdu_processors.values(pair.first)) {
+        i(pair.second);
+    }
 }
 
