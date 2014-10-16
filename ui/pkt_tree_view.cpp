@@ -215,9 +215,6 @@ QStandardItem *pkt_tree_view::__new_tcp_item(Tins::TCP *tcp_pdu)
     child_item->setText(QString(tr("Urgent Ptr: %1")).arg(tcp_pdu->urg_ptr()));
     tcp_item->appendRow(child_item);
 
-
-
-
     return tcp_item;
 }
 
@@ -253,7 +250,14 @@ QStandardItem *pkt_tree_view::__new_icmp_item(Tins::ICMP *icmp_pdu)
     icmp_item = new QStandardItem;
     icmp_item->setText(QString("ICMP - size %1 bytes").arg(icmp_pdu->size()));
 
-    //..
+    child_item = new QStandardItem;
+    child_item->setText(QString(tr("Type: %1")).arg(icmp_pdu->type()));
+    icmp_item->appendRow(child_item);
+    child_item = new QStandardItem;
+    child_item->setText(QString(tr("Code: %1")).arg(icmp_pdu->code()));
+    icmp_item->appendRow(child_item);
+    child_item = new QStandardItem;
+    child_item->setText(QString(tr("Checksum: %1")).arg(icmp_pdu->checksum()));
 
     return icmp_item;
 }

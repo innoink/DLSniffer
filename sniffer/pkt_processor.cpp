@@ -96,7 +96,6 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
             pkt_info->pdu_hash.insert(pkt_info_t::UDP, pdu);
             pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::UDP, pdu));
         } else if (pdu->pdu_type() == Tins::PDU::ICMP) {
-            pkt_info->top_pdu_type = pkt_info_t::pdu_type_t::ICMP;
             pkt_info->pdu_hash.insert(pkt_info_t::ICMP, pdu);
             pkt_info->pdu_list.append(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU*>(pkt_info_t::ICMP, pdu));
         } else {
@@ -175,6 +174,11 @@ bool pkt_processor::__set_top_layer_protocol(pkt_info_t *pi)
     if (pi->pdu_hash.contains(pkt_info_t::ARP)) {
             pi->top_pdu_type = pkt_info_t::ARP;
             strcpy(pi->overview.protocol, "ARP");
+            return true;
+    }
+    if (pi->pdu_hash.contains(pkt_info_t::ICMP)) {
+            pi->top_pdu_type = pkt_info_t::ICMP;
+            strcpy(pi->overview.protocol, "ICMP");
             return true;
     }
     if (pi->pdu_hash.contains(pkt_info_t::TCP)) {
