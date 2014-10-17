@@ -55,6 +55,8 @@ void pkt_processor::proc_pkt(Tins::Packet *pkt)
 
     //get the inner raw pdu, then set pkt->pdu to null.
     raw_pdu = (Tins::RawPDU *)(pkt->release_pdu());
+    if (raw_pdu == nullptr || raw_pdu->payload_size() == 0)
+        goto proc_failed;
     //LayerII
     Tins::EthernetII *eii_pdu;
     bool              is_eii;
@@ -249,8 +251,8 @@ const char *pkt_processor::__timestamp_to_str(Tins::Timestamp &timestamp)
     struct tm *localtm = std::localtime(&sec_tv);
     static char tmpstr[64];
     memset(tmpstr, 0x00, sizeof(tmpstr));
-    std::strftime(tmpstr, 31, "%F %T", localtm);
-    std::snprintf(tmpstr + strlen(tmpstr), 31, " %lu ms %lu us",
+    strftime(tmpstr, 31, "%Y-%m-%d %H:%M:%S", localtm);
+    snprintf(tmpstr + strlen(tmpstr), 31, " %lu ms %lu us",
                   (unsigned long)timestamp.microseconds() / 1000,
                   (unsigned long)timestamp.microseconds() % 1000);
     return tmpstr;

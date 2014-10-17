@@ -54,5 +54,7 @@ unix:{
 win32:{
     DEFINES += _WIN32
     DEFINES += WIN32
-    LIBS +=
+    LIBS += D:\libs\libtins\lib\libtins.a
+    LIBS += -lws2_32 -liphlpapi
+    INCLUDEPATH += D:\libs\libtins\include D:\libs\WpdPack\include
 }
