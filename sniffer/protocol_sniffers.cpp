@@ -1,38 +1,55 @@
 #include "protocol_sniffers.h"
 
 #include <cstdio>
+#include <QRegExp>
+#include <QStringList>
+#include <QDebug>
+#include <QtGlobal>
 
-QList<protocol_sniffers::http_password_t> protocol_sniffers::http_param;
 
-static const char* uname_fileds[5] = {
-  "login",
-  "username",
-  "loginname",
-  "user",
-  "id"
-};
+sniffer_result protocol_sniffers::sresult;
 
 void protocol_sniffers::http_sniffer(const Tins::PDU *http_pdu)
 {
-    protocol_sniffers::http_password_t http_password;
     const Tins::RawPDU *r_http_pdu;
-    QList<protocol_sniffers::http_password_t> *passwords_list;
-    passwords_list = &protocol_sniffers::http_param;
     r_http_pdu = static_cast<const Tins::RawPDU*>(http_pdu);
 
     QString http_str(reinterpret_cast<const char *>(r_http_pdu->payload().data()));
-    for (auto u : uname_fileds) {
-        if (http_str.contains(u, Qt::CaseInsensitive)) {
-            int i;
-            for (i = http_str.indexOf(u, 0, Qt::CaseInsensitive); i < http_str.size() && (http_str.at(i).isLetterOrNumber() || http_str.at(i) == '_'); i++);
-            i++;
-            if (i >= http_str.size())
-                continue;
-            for (; i < http_str.size() && (http_str.at(i).isLetterOrNumber() || http_str.at(i) == '_'); i++) {
-                fprintf(stderr, "%c", http_str.at(i).toLatin1());
-            }
-            fprintf(stderr, "\n");
-        }
+
+    QString prot("HTTP");
+    QString site;
+    QString empty;
+    int pos = 0;
+    QRegExp siterx("(Referer: )([^\\r]*)(\\r\\n)");
+    siterx.setCaseSensitivity(Qt::CaseInsensitive);
+    pos = siterx.indexIn(http_str, pos);
+    if (pos != -1) {
+        site = siterx.cap(2);
     }
+    QRegExp namerx("(username|userid|uid|login|user)(\\w{0,})(=)(\\w{1,32})(\\W)");
+    QRegExp passrx("(password|pass|passwd)(\\w{0,})(=)(\\w{1,32})(\\W)");
+    namerx.setCaseSensitivity(Qt::CaseInsensitive);
+    passrx.setCaseSensitivity(Qt::CaseInsensitive);
+    QStringList namelist;
+    QStringList passlist;
+    pos = 0;
+    while ((pos = namerx.indexIn(http_str, pos)) != -1) {
+        namelist << namerx.cap(4);
+        pos += namerx.matchedLength();
+    }
+    pos = 0;
+    while ((pos = passrx.indexIn(http_str, pos)) != -1) {
+        passlist << passrx.cap(4);
+        pos += passrx.matchedLength();
+    }
+    for (int i = 0; i < qMax(namelist.length(), passlist.length()); i++) {
+        emit sresult.new_sniffer_result(
+                                        prot,
+                                        site,
+                                        i >= namelist.length() ? empty : namelist.at(i),
+                                        i >= passlist.length() ? empty : passlist.at(i)
+                                        );
+    }
+
 
 }

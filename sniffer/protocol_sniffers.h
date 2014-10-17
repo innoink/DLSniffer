@@ -4,18 +4,21 @@
 #include <tins/tins.h>
 #include <QList>
 #include <QString>
+#include <QObject>
+
+class sniffer_result :public QObject
+{
+    Q_OBJECT
+signals:
+    void new_sniffer_result(const QString &protocol, const QString &site, const QString &username, const QString &password);
+};
 
 
 class protocol_sniffers {
-    typedef struct http_password_t {
-        QString site_url;
-        QString username;
-        QString password;
-    } http_password_t;
 
 public:
+    static sniffer_result sresult;
 static void http_sniffer(const Tins::PDU *http_pdu);
-static QList<http_password_t> http_param;
 };
 
 #endif // PROTOCOL_SNIFFERS_H

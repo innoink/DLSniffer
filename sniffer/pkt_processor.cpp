@@ -45,7 +45,6 @@ void pkt_processor::run()
         delete pkt;
     }
     queue_flush_complete(pkt_queue, pkt_deleter);
-
 }
 
 void pkt_processor::proc_pkt(Tins::Packet *pkt)
@@ -209,11 +208,15 @@ bool pkt_processor::__set_top_layer_protocol(pkt_info_t *pi)
             }
         }
     }
-    if (known_port == -1 && pi->pdu_hash.contains(pkt_info_t::TCP)) {
+    if (pi->pdu_hash.contains(pkt_info_t::TCP) &&
+        (known_port == -1 || pi->pdu_hash.value(pkt_info_t::TCP)->inner_pdu() == nullptr ||
+         pi->pdu_hash.value(pkt_info_t::TCP)->inner_pdu()->size() == 0)) {
         pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_TCP;
         strcpy(pi->overview.protocol, "TCP");
     }
-    if (known_port == -1 && pi->pdu_hash.contains(pkt_info_t::UDP)) {
+    if (pi->pdu_hash.contains(pkt_info_t::UDP) &&
+        (known_port == -1 || pi->pdu_hash.value(pkt_info_t::UDP)->inner_pdu() == nullptr ||
+         pi->pdu_hash.value(pkt_info_t::UDP)->inner_pdu()->size() == 0)) {
         pi->top_pdu_type = pkt_info_t::pdu_type_t::UNKNOWN_UDP;
         strcpy(pi->overview.protocol, "UDP");
     }
@@ -263,6 +266,10 @@ void pkt_processor::remove_pdu_processor(pkt_info_t::pdu_type_t ptype, pdu_proce
     this->pdu_processors.remove(ptype, processor);
 }
 
+void pkt_processor::clear_pdu_processors()
+{
+    this->pdu_processors.clear();
+}
 
 void pkt_processor::__run_processors(QPair<enum pkt_info_t::pdu_type_t, Tins::PDU *> &pair)
 {

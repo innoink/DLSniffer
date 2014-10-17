@@ -27,7 +27,8 @@ HEADERS += \
     sniffer/pkt_info.h \
     sniffer/dlsniffer_defs.h \
     ui/QHexView/qhexview.h \
-    sniffer/protocol_sniffers.h
+    sniffer/protocol_sniffers.h \
+    ui/sniffer_list_view.h
 
 SOURCES += \
     sniffer/pkt_capture.cpp \
@@ -42,7 +43,8 @@ SOURCES += \
     sniffer/pkt_worker.cpp \
     ui/pkt_tree_view.cpp \
     ui/QHexView/qhexview.cpp \
-    sniffer/protocol_sniffers.cpp
+    sniffer/protocol_sniffers.cpp \
+    ui/sniffer_list_view.cpp
 
 unix:{
     LIBS += -ltins

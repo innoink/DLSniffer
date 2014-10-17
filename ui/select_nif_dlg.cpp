@@ -12,15 +12,23 @@ select_nif_dlg::select_nif_dlg(QWidget *parent) :
     this->btnok = btnbox->button(QDialogButtonBox::Ok);
     this->btncancle = btnbox->button(QDialogButtonBox::Cancel);
     this->leflt = new QLineEdit;
+    this->gb_sniffers = new QGroupBox(tr("Sniffers:"));
+    this->cb_http = new QCheckBox(tr("HTTP Sniffer"));
+    this->cb_ftp = new QCheckBox(tr("FTP Sniffer"));
     this->model = new QStandardItemModel;
 
-    QVBoxLayout *vl = new QVBoxLayout(this);
+    QVBoxLayout *vl = new QVBoxLayout;
     QHBoxLayout *hl = new QHBoxLayout;
+    vl->addWidget(cb_http);
+    vl->addWidget(cb_ftp);
+    gb_sniffers->setLayout(vl);
+    vl = new QVBoxLayout(this);
     hl->addWidget(new QLabel(tr("Filter:")));
     hl->addWidget(leflt);
     vl->addWidget(nif_list_view);
     vl->addWidget(cb_promisc);
     vl->addLayout(hl);
+    vl->addWidget(gb_sniffers);
     vl->addWidget(btnbox);
 
     btnok->setEnabled(false);
@@ -73,4 +81,14 @@ QString select_nif_dlg::get_filter()
 bool select_nif_dlg::use_promisc()
 {
     return this->cb_promisc->isChecked();
+}
+
+bool select_nif_dlg::use_http_sniffer()
+{
+    return this->cb_http->isChecked();
+}
+
+bool select_nif_dlg::use_ftp_sniffer()
+{
+    return this->cb_ftp->isChecked();
 }

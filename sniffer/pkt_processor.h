@@ -17,6 +17,7 @@ class pkt_processor : public pkt_worker
         explicit pkt_processor(queue_t *pkt_queue, QReadWriteLock *stop_rwlock);
         void add_pdu_processor(enum pkt_info_t::pdu_type_t ptype, pdu_processor_func_t processor);
         void remove_pdu_processor(enum pkt_info_t::pdu_type_t ptype, pdu_processor_func_t processor);
+        void clear_pdu_processors();
     private:
         void run();
     signals:

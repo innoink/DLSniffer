@@ -23,6 +23,8 @@ class sniffer_manager : public QObject
         void set_filter(const char *flt);
         void set_nif(Tins::NetworkInterface nif);
         void set_promisc(bool b);
+        void add_http_sniffer();
+        void clear_sniffer();
         //should have a rfmon option for 802.11 mac!
         //void set_rfmon(bool b);
         Tins::NetworkInterface get_nif();
@@ -30,7 +32,7 @@ class sniffer_manager : public QObject
         void destroy_pkt_info_list();
 
     signals:
-
+        void new_sniffer_result(QString &protocol, QString &site, QString &username, QString &password);
     public slots:
     public:
         pkt_processor *pp_thrd;

@@ -13,8 +13,18 @@ sniffer_manager::sniffer_manager(QObject *parent) :
     pc_thrd = new pkt_capture(pkt_queue, pc_stoprwlock);
     pp_thrd = new pkt_processor(pkt_queue, pp_stoprwlock);
 
+}
+
+void sniffer_manager::add_http_sniffer()
+{
     pp_thrd->add_pdu_processor(pkt_info_t::HTTP, protocol_sniffers::http_sniffer);
 }
+
+void sniffer_manager::clear_sniffer()
+{
+    pp_thrd->clear_pdu_processors();
+}
+
 sniffer_manager::~sniffer_manager()
 {
     stop_capture();
@@ -25,7 +35,6 @@ sniffer_manager::~sniffer_manager()
     delete pp_stoprwlock;
     queue_destroy(pkt_queue);
     destroy_pkt_info_list();
-
 }
 
 void sniffer_manager::destroy_pkt_info_list()

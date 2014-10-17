@@ -10,6 +10,7 @@
 #include <tins/tins.h>
 #include <vector>
 #include <QPushButton>
+#include <QGroupBox>
 
 class select_nif_dlg : public QDialog
 {
@@ -19,6 +20,8 @@ class select_nif_dlg : public QDialog
         Tins::NetworkInterface get_selected();
         bool use_promisc();
         QString get_filter();
+        bool use_http_sniffer();
+        bool use_ftp_sniffer();
 
     signals:
 
@@ -35,6 +38,9 @@ class select_nif_dlg : public QDialog
         QPushButton *btnok;
         QPushButton *btncancle;
         QLineEdit *leflt;
+
+        QGroupBox *gb_sniffers;
+        QCheckBox *cb_http, *cb_ftp;
 
         std::vector<Tins::NetworkInterface> all_nif;
         int selected;
