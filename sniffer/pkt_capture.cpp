@@ -1,7 +1,7 @@
 #include "pkt_capture.h"
 
-pkt_capture::pkt_capture(queue_t *pkt_queue, QReadWriteLock *stop_rwlock) :
-    pkt_worker(pkt_queue, stop_rwlock)
+pkt_capture::pkt_capture(queue_t *pkt_queue) :
+    pkt_worker(pkt_queue)
 {
 }
 
@@ -15,12 +15,9 @@ void pkt_capture::run()
     Tins::Packet *pkt;
     sniffer->set_extract_raw_pdus(true);
     while (true) {
-        stop_rwlock->lockForRead();
-        if (stop) {
-            stop_rwlock->unlock();
+        if (stop.load()) {
             break;
         }
-        stop_rwlock->unlock();
         pkt = new Tins::Packet(sniffer->next_packet());
         queue_put_wait(pkt_queue, pkt);
     }

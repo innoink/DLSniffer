@@ -19,12 +19,12 @@ void pkt_list_view::set_header()
     model->setHeaderData(5, Qt::Horizontal, tr("Packet Size"));
 }
 
-void pkt_list_view::append_item(const char *timestr, const char *srcaddr, const char *dstaddr,
+void pkt_list_view::append_item(int num, const char *timestr, const char *srcaddr, const char *dstaddr,
                                 const char *prot, uint32_t size)
 {
     static QStandardItem *item;
 
-    item = new QStandardItem(QString::number(item_cnt));
+    item = new QStandardItem(QString::number(num));
     model->setItem(item_cnt, 0, item);
     item = new QStandardItem(timestr);
     model->setItem(item_cnt, 1, item);

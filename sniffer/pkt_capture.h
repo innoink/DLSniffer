@@ -10,7 +10,7 @@ class pkt_capture : public pkt_worker
 {
         Q_OBJECT
     public:
-        explicit pkt_capture(queue_t *pkt_queue, QReadWriteLock *stop_rwlock);
+        explicit pkt_capture(queue_t *pkt_queue);
         void set_sniffer(Tins::Sniffer *sniffer);
     private:
         void run();

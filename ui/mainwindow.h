@@ -5,6 +5,8 @@
 #include <QToolBar>
 #include <QAction>
 #include <QList>
+#include <QComboBox>
+#include <QPushButton>
 #include "ui/pkt_list_view.h"
 #include "ui/pkt_tree_view.h"
 #include "ui/select_nif_dlg.h"
@@ -30,6 +32,9 @@ class MainWindow : public QMainWindow
         void select_nif();
         void start();
         void stop();
+        void clear_view();
+        void apply_flt();
+        void clear_flt();
         void proc_selected_item(const QItemSelection & selected,
                                 const QItemSelection & deselected);
 
@@ -48,6 +53,12 @@ class MainWindow : public QMainWindow
         QAction *act_start;
         QAction *act_stop;
         QAction *act_select_nif;
+        QAction *act_clear;
+
+        QComboBox *cb_post_flt;
+        QPushButton *pb_apply_flt;
+        QPushButton *pb_clear_flt;
+
 
 
 };

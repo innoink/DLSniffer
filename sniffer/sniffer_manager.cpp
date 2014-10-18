@@ -7,11 +7,9 @@ sniffer_manager::sniffer_manager(QObject *parent) :
 {
     sniffer = nullptr;
     pkt_queue = queue_create();
-    pc_stoprwlock = new QReadWriteLock;
-    pp_stoprwlock = new QReadWriteLock;
 
-    pc_thrd = new pkt_capture(pkt_queue, pc_stoprwlock);
-    pp_thrd = new pkt_processor(pkt_queue, pp_stoprwlock);
+    pc_thrd = new pkt_capture(pkt_queue);
+    pp_thrd = new pkt_processor(pkt_queue);
 
 }
 
@@ -31,8 +29,6 @@ sniffer_manager::~sniffer_manager()
     release_sniffer();
     delete pc_thrd;
     delete pp_thrd;
-    delete pc_stoprwlock;
-    delete pp_stoprwlock;
     queue_destroy(pkt_queue);
     destroy_pkt_info_list();
 }

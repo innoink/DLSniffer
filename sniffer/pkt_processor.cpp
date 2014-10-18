@@ -6,8 +6,8 @@
 
 #include <QDebug>
 
-pkt_processor::pkt_processor(queue_t *pkt_queue, QReadWriteLock *stop_rwlock) :
-    pkt_worker(pkt_queue, stop_rwlock), pkt_cnt(0)
+pkt_processor::pkt_processor(queue_t *pkt_queue) :
+    pkt_worker(pkt_queue), pkt_cnt(0)
 {
     port_protocol_map.insert(HTTP_PORT, {pkt_info_t::HTTP, pkt_info_t::TCP, "HTTP"});
     port_protocol_map.insert(HTTPS_PORT, {pkt_info_t::HTTPS, pkt_info_t::TCP, "HTTPS"});
@@ -31,12 +31,9 @@ void pkt_processor::run()
     Tins::Packet *pkt;
     pkt_cnt = 0;
     while (true) {
-        stop_rwlock->lockForRead();
-        if (stop) {
-            stop_rwlock->unlock();
+        if (stop.load()) {
             break;
         }
-        stop_rwlock->unlock();
         queue_get_wait(pkt_queue, (void **)&pkt);
         if (pkt == nullptr)
             continue;
