@@ -162,7 +162,6 @@ void MainWindow::clear_view()
     ptv->clear();
     slv->clear();
     hex_view->clear();
-    act_clear->setEnabled(false);
 }
 
 
