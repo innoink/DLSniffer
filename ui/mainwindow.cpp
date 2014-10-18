@@ -8,6 +8,39 @@
 #include "sniffer/dlsniffer_defs.h"
 #include "sniffer/protocol_sniffers.h"
 
+
+char *my_strcasestr(const char *haystack, const char *needle)
+{
+    unsigned char lcn, ucn;
+    unsigned i;
+    if (haystack == NULL || needle == NULL)
+        return NULL;
+    lcn = ucn = needle[0];
+    if (isupper(lcn))
+        lcn = tolower(lcn);
+    else if (islower(ucn))
+        ucn = toupper(ucn);
+    if (lcn == 0)
+        return (char *)haystack;
+    while (haystack[0] != 0) {
+        if (lcn == haystack[0] || ucn == haystack[0]) {
+            for (i = 1; ; i++) {
+                char n = needle[i], h = haystack[i];
+                if (n == 0)
+                    return (char *)haystack;
+                if (h == 0)
+                    return NULL;
+                if (isupper(n)) n = tolower(n);
+                if (isupper(h)) h = tolower(h);
+                if (n != h)
+                    break;
+            }
+        }
+        haystack++;
+    }
+    return NULL;	/* Not found */
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -171,7 +204,7 @@ void MainWindow::apply_flt()
     QString fltstr = cb_post_flt->currentText();
     int pos = 0;
     for (pkt_info_t *i : smgr->pkt_info_list) {
-        if (strcasestr(i->overview.protocol, fltstr.toStdString().data()) != nullptr) {
+        if (my_strcasestr(i->overview.protocol, fltstr.toStdString().data()) != nullptr) {
             plv->append_item(pos,
                             i->overview.timestampstr,
                             i->overview.src,
